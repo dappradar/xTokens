@@ -10,7 +10,7 @@ import {ScriptingLibrary} from './ScriptingLibrary/ScriptingLibrary.sol';
 contract MultichainDeploy is Script, ScriptingLibrary {
   uint256 public deployer = vm.envUint('DEPLOYER_PRIVATE_KEY');
   address constant CREATE2 = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
-  string[] public chains = ['POLYGON_RPC', 'OPTIMISM_RPC', 'GOERLI_RPC'];
+  string[] public chains = ['MUMBAI_RPC'];
 
   function run() public {
     //TODO: Change salt from this test to prod before release

@@ -5,8 +5,9 @@ import {IXERC20} from 'interfaces/IXERC20.sol';
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IXERC20Lockbox} from 'interfaces/IXERC20Lockbox.sol';
+import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 
-contract XERC20Lockbox is IXERC20Lockbox {
+contract XERC20Lockbox is IXERC20Lockbox, ReentrancyGuard {
   using SafeERC20 for IERC20;
 
   /**
@@ -42,7 +43,7 @@ contract XERC20Lockbox is IXERC20Lockbox {
    * @notice Deposit native tokens into the lockbox
    */
 
-  function deposit() public payable {
+  function deposit() public payable nonReentrant {
     if (!IS_NATIVE) revert IXERC20Lockbox_NotNative();
     XERC20.mint(msg.sender, msg.value);
 
@@ -55,7 +56,7 @@ contract XERC20Lockbox is IXERC20Lockbox {
    * @param _amount The amount of tokens to deposit
    */
 
-  function deposit(uint256 _amount) external {
+  function deposit(uint256 _amount) external nonReentrant {
     if (IS_NATIVE) revert IXERC20Lockbox_Native();
 
     ERC20.safeTransferFrom(msg.sender, address(this), _amount);
@@ -70,7 +71,7 @@ contract XERC20Lockbox is IXERC20Lockbox {
    * @param _amount The amount of tokens to withdraw
    */
 
-  function withdraw(uint256 _amount) external {
+  function withdraw(uint256 _amount) external nonReentrant {
     XERC20.burn(msg.sender, _amount);
 
     if (IS_NATIVE) {

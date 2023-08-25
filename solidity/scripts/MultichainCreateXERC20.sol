@@ -11,14 +11,14 @@ import {ScriptingLibrary} from './ScriptingLibrary/ScriptingLibrary.sol';
 
 contract MultichainCreateXERC20 is Script, ScriptingLibrary {
   uint256 public deployer = vm.envUint('DEPLOYER_PRIVATE_KEY');
-  string[] public chains = ['POLYGON_RPC', 'OPTIMISM_RPC', 'GOERLI_RPC'];
+  string[] public chains = ['MUMBAI_RPC'];
   string public temp = vm.readLine('./solidity/scripts/ScriptingLibrary/FactoryAddress.txt');
 
   address public fact = toAddress(temp);
   XERC20Factory public factory = XERC20Factory(fact);
   // NOTE: This is an array of the addresses of the ERC20 contract you are deploying the lockbox for, if you dont want to deploy a lockbox leave this as is
   // NOTE: You must add the token address of your token for each chain you are deploying to in order of how the chains are listed in chains.txt, if no address is listed we will not deplyo a lockbox
-  address[] public erc20 = [address(0)];
+  address[] public erc20 = [address(0x9Bb4Ce00633fBF7e9Ed10b7eF75441de0ADA69a6)];
   // NOTE: Please also for each add a boolean to this array, if you are deploying a lockbox for the native token set it to true, if not set it to false for each iteration of an erc20
   bool[] public isNative = [false];
 
@@ -29,8 +29,8 @@ contract MultichainCreateXERC20 is Script, ScriptingLibrary {
     uint256[][] memory burnLimits = new uint256[][](chains.length);
 
     // Below are all the variables you need to change when deploying your XERC20 token
-    string memory name = 'Test Token';
-    string memory symbol = 'TST';
+    string memory name = 'DappRadar';
+    string memory symbol = 'RADAR';
 
     for (uint256 i; i < chains.length; i++) {
       bridges[i] = new address[](0);

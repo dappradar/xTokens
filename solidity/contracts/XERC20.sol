@@ -5,8 +5,9 @@ import {IXERC20} from 'interfaces/IXERC20.sol';
 import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {ERC20Permit} from '@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol';
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 
-contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
+contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit, ReentrancyGuard {
   /**
    * @notice The duration it takes for the limits to fully replenish
    */
@@ -51,7 +52,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _amount The amount of tokens being minted
    */
 
-  function mint(address _user, uint256 _amount) public {
+  function mint(address _user, uint256 _amount) public nonReentrant {
     _mintWithCaller(msg.sender, _user, _amount);
   }
 
@@ -62,7 +63,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit {
    * @param _amount The amount of tokens being burned
    */
 
-  function burn(address _user, uint256 _amount) public {
+  function burn(address _user, uint256 _amount) public nonReentrant {
     _burnWithCaller(msg.sender, _user, _amount);
   }
 

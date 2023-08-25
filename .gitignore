@@ -19,3 +19,7 @@ out/*/*
 
 # Keep the latest deployment only
 broadcast/*/*/*
+/.idea/modules.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+/.idea/xTokensDappRadar.iml
