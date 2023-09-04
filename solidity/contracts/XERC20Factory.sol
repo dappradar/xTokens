@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity 0.8.18;
 
 import {XERC20} from 'contracts/XERC20.sol';
 import {IXERC20Factory} from 'interfaces/IXERC20Factory.sol';
 import {XERC20Lockbox} from 'contracts/XERC20Lockbox.sol';
 import {CREATE3} from 'isolmate/utils/CREATE3.sol';
+import {Ownable2Step} from '@openzeppelin/contracts/access/Ownable2Step.sol';
 import {EnumerableSet} from '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 
-contract XERC20Factory is IXERC20Factory {
+contract XERC20Factory is Ownable2Step, IXERC20Factory {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   /**
    * @notice Address of the xerc20 maps to the address of its lockbox if it has one
    */
-  mapping(address => address) public lockboxRegistry;
+  mapping(address xerc20Address => address lockboxAddress) public lockboxRegistry;
 
   /**
    * @notice The set of registered lockboxes
@@ -41,7 +42,7 @@ contract XERC20Factory is IXERC20Factory {
     uint256[] memory _minterLimits,
     uint256[] memory _burnerLimits,
     address[] memory _bridges
-  ) external returns (address _xerc20) {
+  ) external onlyOwner returns (address _xerc20) {
     _xerc20 = _deployXERC20(_name, _symbol, _minterLimits, _burnerLimits, _bridges);
 
     emit XERC20Deployed(_xerc20);
@@ -59,7 +60,7 @@ contract XERC20Factory is IXERC20Factory {
     address _xerc20,
     address _baseToken,
     bool _isNative
-  ) external returns (address payable _lockbox) {
+  ) external onlyOwner returns (address payable _lockbox) {
     if (_baseToken == address(0) && !_isNative) revert IXERC20Factory_BadTokenAddress();
 
     if (XERC20(_xerc20).owner() != msg.sender) revert IXERC20Factory_NotOwner();
@@ -158,7 +159,8 @@ contract XERC20Factory is IXERC20Factory {
 
     _xerc20 = CREATE3.deploy(_salt, _bytecode, 0);
 
-    EnumerableSet.add(_xerc20RegistryArray, _xerc20);
+    bool savedXErc20 = EnumerableSet.add(_xerc20RegistryArray, _xerc20);
+    require(savedXErc20, 'Not saved into EnumerableSet');
 
     for (uint256 _i; _i < _bridgesLength; ++_i) {
       XERC20(_xerc20).setLimits(_bridges[_i], _minterLimits[_i], _burnerLimits[_i]);
@@ -179,7 +181,8 @@ contract XERC20Factory is IXERC20Factory {
     _lockbox = payable(CREATE3.deploy(_salt, _bytecode, 0));
 
     XERC20(_xerc20).setLockbox(address(_lockbox));
-    EnumerableSet.add(_lockboxRegistryArray, _lockbox);
+    bool savedLockbox = EnumerableSet.add(_lockboxRegistryArray, _lockbox);
+    require(savedLockbox, 'Not saved into EnumerableSet');
     lockboxRegistry[_xerc20] = _lockbox;
   }
 }

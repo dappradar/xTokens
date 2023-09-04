@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity 0.8.18;
 
 import {IXERC20} from 'interfaces/IXERC20.sol';
 import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {ERC20Permit} from '@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol';
-import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
+import {Ownable2Step} from '@openzeppelin/contracts/access/Ownable2Step.sol';
 import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 
-contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit, ReentrancyGuard {
+contract XERC20 is ERC20, Ownable2Step, IXERC20, ERC20Permit, ReentrancyGuard {
   /**
    * @notice The duration it takes for the limits to fully replenish
    */
@@ -26,7 +26,7 @@ contract XERC20 is ERC20, Ownable, IXERC20, ERC20Permit, ReentrancyGuard {
   /**
    * @notice Maps bridge address to bridge configurations
    */
-  mapping(address => Bridge) public bridges;
+  mapping(address bridgeAddress => Bridge) public bridges;
 
   /**
    * @notice Constructs the initial config of the XERC20
