@@ -53,6 +53,9 @@ contract MultichainCreateXERC20 is Script, ScriptingLibrary {
       );
 
       address xerc20 = factory.deployXERC20(name, symbol, minterLimits[i], burnLimits[i], bridges[i]);
+
+      XERC20(xerc20).acceptOwnership();
+
       address lockbox;
       if (_erc20 != address(0) && !_isNative) {
         lockbox = factory.deployLockbox(xerc20, _erc20, _isNative);
