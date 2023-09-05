@@ -9,27 +9,22 @@ import {ScriptingLibrary} from './ScriptingLibrary/ScriptingLibrary.sol';
 
 contract MultichainDeploy is Script, ScriptingLibrary {
   uint256 public deployer = vm.envUint('DEPLOYER_PRIVATE_KEY');
-  // NOTE: CHANGEABLE ? 
+  // NOTE: CHANGEABLE ?
   address constant CREATE2 = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
   string[] public chains = ['MUMBAI_RPC'];
 
   function run() public {
-    //TODO: Change salt from this test to prod before release
-    bytes32 _salt = keccak256(abi.encodePacked('xxxsdsdd23ewXERewewCewew20Factoewewry', msg.sender));
     address[] memory factories = new address[](chains.length);
 
     for (uint256 i; i < chains.length; i++) {
       vm.createSelectFork(vm.rpcUrl(vm.envString(chains[i])));
       vm.startBroadcast(deployer);
-      address _deployedFactory = getAddress(type(XERC20Factory).creationCode, _salt, CREATE2);
 
-      if (keccak256(_deployedFactory.code) != keccak256(type(XERC20Factory).runtimeCode)) {
-        new XERC20Factory{salt: _salt}();
-      }
+      address deployedContractAddress = address(new XERC20Factory());
 
       vm.stopBroadcast();
-      console.log(chains[i], 'factory deployed to:', address(_deployedFactory));
-      factories[i] = _deployedFactory;
+      console.log(chains[i], 'factory deployed to:', address(deployedContractAddress));
+      factories[i] = deployedContractAddress;
     }
 
     if (chains.length > 1) {
